@@ -6,33 +6,31 @@
 
 <style>
 body{
-font-family:Arial;
 background:#111;
 color:white;
+font-family:Arial;
 text-align:center;
 }
 
 .box{
 border:2px dashed #777;
+border-radius:15px;
 padding:20px;
 margin:20px;
-border-radius:15px;
 }
 
 button{
 background:#7357ff;
 color:white;
 border:0;
-padding:12px 20px;
+padding:12px 25px;
 border-radius:10px;
 font-size:16px;
-cursor:pointer;
 }
 
 canvas{
 margin-top:20px;
-background:white;
-max-width:90%;
+max-width:95%;
 }
 </style>
 </head>
@@ -41,129 +39,160 @@ max-width:90%;
 
 <h1>🤖 Roblox Cover AI</h1>
 
-
 <div class="box">
-
-<h3>🧍 Скин персонажа</h3>
-
-<input type="file" id="skin" accept="image/*">
-
+<h3>🧍 Скин</h3>
+<input id="skin" type="file" accept="image/*">
 </div>
 
 
-
 <div class="box">
-
-<h3>🎒 Предметы вокруг</h3>
-
-<input type="file" id="items" accept="image/*" multiple>
-
+<h3>🎒 Лист предметов</h3>
+<input id="items" type="file" accept="image/*">
 </div>
 
 
-<button onclick="makeCover()">
-Собрать обложку
-</button>
-
+<button onclick="create()">Создать обложку</button>
 
 <br>
 
-<canvas id="canvas" width="1200" height="1200"></canvas>
+<canvas id="c" width="1200" height="1200"></canvas>
 
 <br>
 
-<button onclick="download()">
-Скачать PNG
-</button>
-
+<button onclick="save()">Скачать PNG</button>
 
 
 <script>
 
-let canvas=document.getElementById("canvas");
+let canvas=document.getElementById("c");
 let ctx=canvas.getContext("2d");
 
-
-let skinImg;
-let items=[];
-
+let skin=null;
+let itemSheet=null;
 
 
 document.getElementById("skin").onchange=e=>{
-
 let img=new Image();
-
-img.onload=()=>skinImg=img;
-
+img.onload=()=>skin=img;
 img.src=URL.createObjectURL(e.target.files[0]);
-
 }
-
 
 
 document.getElementById("items").onchange=e=>{
+let img=new Image();
+img.onload=()=>itemSheet=img;
+img.src=URL.createObjectURL(e.target.files[0]);
+}
 
-items=[];
 
-for(let file of e.target.files){
+
+function cutItems(){
+
+let arr=[];
+
+if(!itemSheet)return arr;
+
+
+// сетка как Roblox каталог
+
+let cols=8;
+let rows=8;
+
+
+let w=itemSheet.width/cols;
+let h=itemSheet.height/rows;
+
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+let temp=document.createElement("canvas");
+temp.width=w;
+temp.height=h;
+
+let t=temp.getContext("2d");
+
+t.drawImage(
+itemSheet,
+x*w,
+y*h,
+w,
+h,
+0,
+0,
+w,
+h
+);
+
 
 let img=new Image();
 
-img.onload=()=>{
+img.src=temp.toDataURL();
 
-items.push(img);
-
-}
-
-img.src=URL.createObjectURL(file);
+arr.push(img);
 
 }
 
 }
 
+return arr;
+
+}
 
 
 
-function makeCover(){
+
+function create(){
 
 ctx.clearRect(0,0,1200,1200);
 
 
-ctx.fillStyle="#ffffff";
+// фон
 
+let grad=ctx.createLinearGradient(0,0,1200,1200);
+grad.addColorStop(0,"#222");
+grad.addColorStop(1,"#555");
+
+ctx.fillStyle=grad;
 ctx.fillRect(0,0,1200,1200);
 
 
 
-// предметы
+let items=cutItems();
 
-let positions=[
 
-[80,80],
-[500,80],
-[900,80],
+// предметы вокруг
 
-[80,500],
-[900,500],
+let pos=[
 
-[100,900],
-[500,900],
-[900,900]
+[50,50],
+[430,40],
+[820,50],
+
+[50,430],
+[850,430],
+
+[70,850],
+[430,900],
+[820,850]
 
 ];
 
 
-items.forEach((img,i)=>{
+items.slice(0,8).forEach((img,i)=>{
 
-let p=positions[i%positions.length];
+setTimeout(()=>{
 
 ctx.drawImage(
 img,
-p[0],
-p[1],
-220,
-220
+pos[i][0],
+pos[i][1],
+250,
+250
 );
+
+},100);
 
 });
 
@@ -171,14 +200,14 @@ p[1],
 
 // персонаж
 
-if(skinImg){
+if(skin){
 
 ctx.drawImage(
-skinImg,
-430,
-250,
-340,
-600
+skin,
+400,
+260,
+400,
+650
 );
 
 }
@@ -188,7 +217,7 @@ skinImg,
 
 
 
-function download(){
+function save(){
 
 let a=document.createElement("a");
 
@@ -202,7 +231,6 @@ a.click();
 
 
 </script>
-
 
 </body>
 </html>
