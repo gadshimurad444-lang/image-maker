@@ -1,363 +1,188 @@
-<!doctype html>
-<html lang="ru">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111827">
-  <title>Image Maker — обложка из скриншотов</title>
-  <style>
-    *{box-sizing:border-box}
-    :root{
-      --bg:#0b1020;--panel:#111827;--panel2:#172033;--line:#29344a;
-      --text:#f5f7fb;--muted:#a9b4c7;--accent:#7c5cff;--accent2:#9a86ff;
-      --danger:#ef4444;--ok:#22c55e;
-    }
-    html,body{margin:0;background:linear-gradient(180deg,#09101d,#0b1020 50%,#0a0f1b);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    body{min-height:100vh}
-    .wrap{max-width:920px;margin:0 auto;padding:18px 14px 34px}
-    h1{font-size:24px;line-height:1.15;margin:0 0 7px}
-    .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
-    .panel{
-      background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:18px;
-      padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.18);margin-bottom:12px
-    }
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{
-      border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:12px;
-      padding:11px 14px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px
-    }
-    .btn.primary{background:var(--accent);border-color:var(--accent);box-shadow:0 7px 22px rgba(124,92,255,.24)}
-    .btn.primary:active{background:#6949ef}
-    .btn.small{padding:8px 10px;min-height:36px;font-size:12px}
-    .btn.danger{color:#fecaca;border-color:#5e2730}
-    .btn[disabled]{opacity:.45;cursor:not-allowed}
-    input[type=file]{display:none}
-    label.filebtn{display:inline-flex;align-items:center;justify-content:center}
-    .note{margin-top:9px;color:var(--muted);font-size:12px}
-    .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    .control{background:#0e1625;border:1px solid var(--line);border-radius:14px;padding:11px}
-    .control label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-    select,input[type=number]{
-      width:100%;background:#0b1220;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 11px;font-size:14px
-    }
-    .screens{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-    .card{position:relative;background:#0d1524;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-    .thumb{aspect-ratio:16/10;background:#070b12;display:flex;align-items:center;justify-content:center}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .meta{padding:8px 9px}
-    .name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#d8dfeb}
-    .tag{font-size:10px;margin-top:3px;color:var(--accent2);font-weight:800}
-    .actions{display:flex;gap:5px;margin-top:7px}
-    .actions .btn{flex:1}
-    .empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:14px}
-    .canvasWrap{background:#080c14;border:1px solid var(--line);border-radius:16px;padding:9px;margin-top:12px;display:flex;justify-content:center}
-    canvas{width:100%;height:auto;max-height:70vh;object-fit:contain;border-radius:10px;background:#161b27}
-    .status{font-size:12px;color:var(--muted);margin-top:8px;min-height:18px}
-    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .pill{padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:#0e1625;color:var(--muted);font-size:11px}
-    .footer{color:#718096;font-size:11px;text-align:center;margin-top:16px}
-    @media(max-width:650px){
-      .controls{grid-template-columns:1fr}
-      .screens{grid-template-columns:repeat(2,1fr)}
-      h1{font-size:22px}
-      .wrap{padding:14px 10px 28px}
-    }
-    @media(min-width:900px){
-      .screens{grid-template-columns:repeat(4,1fr)}
-    }
-  </style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roblox Cover Auto</title>
+
+<style>
+body{
+font-family:Arial;
+background:#fff;
+text-align:center;
+padding:20px;
+}
+
+.box{
+border:2px dashed #777;
+padding:15px;
+margin:15px;
+border-radius:15px;
+}
+
+img{
+max-width:150px;
+margin:5px;
+}
+
+button{
+padding:12px;
+margin:5px;
+border-radius:10px;
+border:0;
+background:#6c5ce7;
+color:white;
+font-size:16px;
+}
+
+canvas{
+max-width:95%;
+border:1px solid #aaa;
+}
+</style>
 </head>
+
 <body>
-<div class="wrap">
-  <h1>Image Maker</h1>
-  <div class="sub">Загрузи несколько скриншотов → выбери центральный → получи готовую обложку.</div>
 
-  <section class="panel">
-    <div class="row">
-      <label class="btn primary filebtn">
-        Добавить скриншоты
-        <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" multiple>
-      </label>
-      <button class="btn danger" id="clearBtn">Очистить</button>
-    </div>
-    <div class="note">Картинки обрабатываются прямо в браузере. На сервер они не отправляются.</div>
-    <div id="screens" class="screens"></div>
-    <div id="empty" class="empty">Пока нет скриншотов. Добавь до 30 картинок.</div>
-  </section>
+<h2>Roblox Cover Auto</h2>
 
-  <section class="panel">
-    <div class="controls">
-      <div class="control">
-        <label for="template">Шаблон</label>
-        <select id="template">
-          <option value="center">Обложка — большой центр</option>
-          <option value="grid">Сетка — все равные</option>
-          <option value="strip">Полоса — горизонтальный коллаж</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="size">Размер</label>
-        <select id="size">
-          <option value="1000">1000 × 1000</option>
-          <option value="1200" selected>1200 × 1200</option>
-          <option value="1400">1400 × 1400</option>
-          <option value="1600">1600 × 1600</option>
-          <option value="2000">2000 × 2000</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="gap">Расстояние между фото, px</label>
-        <input id="gap" type="number" min="0" max="60" value="14">
-      </div>
-      <div class="control">
-        <label for="bg">Фон</label>
-        <select id="bg">
-          <option value="dark" selected>Тёмный</option>
-          <option value="black">Чёрный</option>
-          <option value="white">Белый</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="legend">
-      <div class="pill">Центральное фото: нажми «Центр»</div>
-      <div class="pill">Порядок: ↑ ↓</div>
-      <div class="pill">Удаление: ✕</div>
-    </div>
-
-    <div class="canvasWrap">
-      <canvas id="canvas" width="1200" height="1200"></canvas>
-    </div>
-    <div id="status" class="status">Добавь изображения, чтобы построить обложку.</div>
-
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="makeBtn">Собрать обложку</button>
-      <button class="btn" id="pngBtn">Скачать PNG</button>
-      <button class="btn" id="jpgBtn">Скачать JPG</button>
-    </div>
-  </section>
-
-  <div class="footer">Работает прямо в браузере на телефоне и ПК.</div>
+<div class="box">
+<h3>🧍 Скин персонажа</h3>
+<input type="file" id="skin" accept="image/*">
+<br>
+<img id="skinPreview">
 </div>
 
+
+<div class="box">
+<h3>🎒 Предметы</h3>
+<input type="file" id="items" multiple accept="image/*">
+<div id="itemsPreview"></div>
+</div>
+
+
+<button onclick="makeCover()">🖼 Собрать обложку</button>
+<br>
+
+<button onclick="downloadPNG()">Скачать PNG</button>
+
+
+<br><br>
+
+<canvas id="canvas" width="1200" height="1200"></canvas>
+
+
 <script>
-(() => {
-  const MAX_FILES = 30;
-  const state = {items:[], centerId:null};
 
-  const $ = id => document.getElementById(id);
-  const fileInput = $("fileInput");
-  const screens = $("screens");
-  const empty = $("empty");
-  const canvas = $("canvas");
-  const ctx = canvas.getContext("2d");
-  const status = $("status");
+let skinImg=null;
+let itemImgs=[];
 
-  function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+skin.onchange=e=>{
+let f=e.target.files[0];
+skinImg=new Image();
+skinImg.onload=()=>{
+skinPreview.src=skinImg.src;
+}
+skinImg.src=URL.createObjectURL(f);
+}
 
-  function fitRect(sw, sh, dw, dh) {
-    const sr = sw/sh, dr = dw/dh;
-    let w,h,x,y;
-    if (sr > dr) { h = dh; w = h*sr; x = (dw-w)/2; y = 0; }
-    else { w = dw; h = w/sr; x = 0; y = (dh-h)/2; }
-    return {x,y,w,h};
-  }
 
-  function cover(img, x,y,w,h){
-    const r=fitRect(img.naturalWidth,img.naturalHeight,w,h);
-    ctx.save(); ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
-    ctx.drawImage(img,x+r.x,y+r.y,r.w,r.h); ctx.restore();
-  }
+items.onchange=e=>{
+itemImgs=[];
 
-  function roundedRect(x,y,w,h,r){
-    const rr=Math.min(r,Math.min(w,h)/2);
-    ctx.beginPath(); ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr);
-    ctx.arcTo(x+w,y+h,x,y+h,rr); ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath();
-  }
+for(let f of e.target.files){
 
-  function getBg(){
-    const v=$("bg").value;
-    return v==="white" ? "#ffffff" : v==="black" ? "#000000" : "#111827";
-  }
+let img=new Image();
 
-  function centerItem(){
-    return state.items.find(x=>x.id===state.centerId) || state.items[0] || null;
-  }
+img.onload=()=>{
+itemImgs.push(img);
+drawPreview();
+}
 
-  function draw(){
-    const size=parseInt($("size").value,10);
-    canvas.width=size; canvas.height=size;
-    ctx.fillStyle=getBg(); ctx.fillRect(0,0,size,size);
+img.src=URL.createObjectURL(f);
 
-    if(!state.items.length){
-      ctx.fillStyle="#5e6b82"; ctx.font=`700 ${Math.max(22,size/28)}px system-ui`;
-      ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText("Добавь скриншоты",size/2,size/2);
-      return;
-    }
+}
 
-    const gap=Math.max(0,Math.min(60,parseInt($("gap").value||0,10)));
-    const items=state.items.slice();
-    const tpl=$("template").value;
-    const center=centerItem();
+}
 
-    if(tpl==="center"){
-      const outer=gap;
-      const sideW=(size-outer*4)*0.24;
-      const centerW=size-outer*4-sideW*2;
-      const centerX=outer+sideW+outer;
-      const tileW=sideW;
-      const tileH=(size-outer*5)/4;
-      const radius=Math.max(10,size/55);
 
-      if(center?.img){
-        ctx.save(); roundedRect(centerX,outer,centerW,size-outer*2,radius); ctx.clip();
-        cover(center.img,centerX,outer,centerW,size-outer*2); ctx.restore();
-        ctx.strokeStyle="rgba(255,255,255,.12)"; ctx.lineWidth=Math.max(2,size/500);
-        roundedRect(centerX,outer,centerW,size-outer*2,radius); ctx.stroke();
-      }
+function drawPreview(){
 
-      const sides=items.filter(i=>i.id!==center?.id).slice(0,8);
-      const slots=[];
-      for(let c=0;c<2;c++) for(let r=0;r<4;r++) slots.push({
-        x:outer+c*(tileW+centerW+outer+outer), y:outer+r*(tileH+gap), w:tileW, h:tileH
-      });
-      // simpler explicit left/right coordinates
-      slots.length=0;
-      for(let r=0;r<4;r++){
-        slots.push({x:outer,y:outer+r*(tileH+gap),w:tileW,h:tileH});
-        slots.push({x:centerX+centerW+outer,y:outer+r*(tileH+gap),w:tileW,h:tileH});
-      }
-      sides.forEach((it,idx)=>{
-        const s=slots[idx]; if(!s||!it.img) return;
-        ctx.save(); roundedRect(s.x,s.y,s.w,s.h,radius); ctx.clip();
-        cover(it.img,s.x,s.y,s.w,s.h); ctx.restore();
-      });
-    } else if(tpl==="grid"){
-      const n=items.length;
-      const cols=n<=4?2:n<=9?3:4;
-      const rows=Math.ceil(n/cols);
-      const cellW=(size-gap*(cols+1))/cols;
-      const cellH=(size-gap*(rows+1))/rows;
-      const radius=Math.max(8,size/65);
-      items.forEach((it,idx)=>{
-        const c=idx%cols,r=Math.floor(idx/cols);
-        const x=gap+c*(cellW+gap), y=gap+r*(cellH+gap);
-        ctx.save(); roundedRect(x,y,cellW,cellH,radius); ctx.clip();
-        cover(it.img,x,y,cellW,cellH); ctx.restore();
-        if(it.id===state.centerId){
-          ctx.strokeStyle="#9a86ff"; ctx.lineWidth=Math.max(4,size/320);
-          roundedRect(x,y,cellW,cellH,radius); ctx.stroke();
-        }
-      });
-    } else {
-      const gap2=gap;
-      const totalW=size-gap2*(items.length+1);
-      const cellW=Math.max(1,totalW/items.length);
-      const h=size-gap2*2;
-      const radius=Math.max(8,size/60);
-      items.forEach((it,idx)=>{
-        const x=gap2+idx*(cellW+gap2), y=gap2;
-        ctx.save(); roundedRect(x,y,cellW,h,radius); ctx.clip();
-        cover(it.img,x,y,cellW,h); ctx.restore();
-      });
-    }
-  }
+itemsPreview.innerHTML="";
 
-  function renderList(){
-    screens.innerHTML="";
-    empty.style.display=state.items.length?"none":"block";
-    state.items.forEach((it,idx)=>{
-      const card=document.createElement("div");
-      card.className="card";
-      const isCenter=it.id===state.centerId;
-      card.innerHTML=`
-        <div class="thumb"><img src="${it.url}" alt=""></div>
-        <div class="meta">
-          <div class="name">${escapeHtml(it.file.name)}</div>
-          <div class="tag">${isCenter?"ЦЕНТР":"Скриншот "+(idx+1)}</div>
-          <div class="actions">
-            <button class="btn small" data-act="center">${isCenter?"✓ Центр":"Центр"}</button>
-            <button class="btn small" data-act="up" ${idx===0?"disabled":""}>↑</button>
-            <button class="btn small" data-act="down" ${idx===state.items.length-1?"disabled":""}>↓</button>
-            <button class="btn small danger" data-act="del">✕</button>
-          </div>
-        </div>`;
-      card.querySelectorAll("button").forEach(b=>{
-        b.addEventListener("click",()=>{
-          const act=b.dataset.act;
-          if(act==="center") state.centerId=it.id;
-          if(act==="up" && idx>0) [state.items[idx-1],state.items[idx]]=[state.items[idx],state.items[idx-1]];
-          if(act==="down" && idx<state.items.length-1) [state.items[idx+1],state.items[idx]]=[state.items[idx],state.items[idx+1]];
-          if(act==="del"){
-            if(state.centerId===it.id) state.centerId=null;
-            it.url && URL.revokeObjectURL(it.url);
-            state.items=state.items.filter(x=>x.id!==it.id);
-          }
-          renderList(); draw();
-        });
-      });
-      screens.appendChild(card);
-    });
-    draw();
-  }
+itemImgs.forEach(x=>{
+itemsPreview.appendChild(x.cloneNode());
+})
 
-  function escapeHtml(s){
-    return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-  }
+}
 
-  async function addFiles(files){
-    const remaining=MAX_FILES-state.items.length;
-    const list=Array.from(files).slice(0,remaining);
-    if(!list.length){ status.textContent=`Можно загрузить максимум ${MAX_FILES} изображений.`; return; }
-    for(const file of list){
-      if(file.type && !file.type.startsWith('image/')) continue;
-      const url=URL.createObjectURL(file);
-      const img=new Image();
-      await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=url; });
-      state.items.push({id:uid(),file,url,img});
-      if(!state.centerId) state.centerId=state.items[0].id;
-    }
-    status.textContent=`Загружено: ${state.items.length}/${MAX_FILES}`;
-    renderList();
-  }
 
-  fileInput.addEventListener("change", async e=>{
-    try { await addFiles(e.target.files); }
-    catch { status.textContent="Не удалось открыть одну из картинок."; }
-    e.target.value="";
-  });
 
-  $("clearBtn").addEventListener("click",()=>{
-    state.items.forEach(it=>it.url&&URL.revokeObjectURL(it.url));
-    state.items=[]; state.centerId=null;
-    status.textContent="Готово. Добавь скриншоты.";
-    renderList();
-  });
+function makeCover(){
 
-  $("makeBtn").addEventListener("click",()=>{ draw(); status.textContent="Обложка обновлена."; });
-  ["template","size","gap","bg"].forEach(id=>$(id).addEventListener("change",draw));
+let c=document.getElementById("canvas");
+let ctx=c.getContext("2d");
 
-  function download(ext){
-    if(!state.items.length){ status.textContent="Сначала добавь картинки."; return; }
-    draw();
-    const mime=ext==="jpg"?"image/jpeg":"image/png";
-    const quality=ext==="jpg"?0.94:1;
-    canvas.toBlob(blob=>{
-      if(!blob){ status.textContent="Не удалось создать файл."; return; }
-      const a=document.createElement("a");
-      a.href=URL.createObjectURL(blob);
-      a.download=`oblozhka_${Date.now()}.${ext}`;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-      status.textContent=`Файл ${ext.toUpperCase()} готов.`;
-    },mime,quality);
-  }
-  $("pngBtn").addEventListener("click",()=>download("png"));
-  $("jpgBtn").addEventListener("click",()=>download("jpg"));
 
-  renderList();
-})();
+ctx.fillStyle="white";
+ctx.fillRect(0,0,1200,1200);
+
+
+// персонаж центр
+
+if(skinImg){
+
+ctx.drawImage(
+skinImg,
+400,
+250,
+400,
+600
+);
+
+}
+
+
+// предметы
+
+let pos=[
+[50,100],[250,100],[50,350],[250,350],
+[750,100],[950,100],[750,350],[950,350],
+[50,750],[250,750],[750,750],[950,750]
+];
+
+
+itemImgs.slice(0,12).forEach((img,i)=>{
+
+let p=pos[i];
+
+ctx.drawImage(
+img,
+p[0],
+p[1],
+150,
+150
+);
+
+});
+
+
+}
+
+
+function downloadPNG(){
+
+let a=document.createElement("a");
+
+a.download="roblox-cover.png";
+
+a.href=canvas.toDataURL();
+
+a.click();
+
+}
+
+
 </script>
+
 </body>
 </html>
